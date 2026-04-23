@@ -1,14 +1,10 @@
 // API client wired to the NutraFit backend.
 import { INDIAN_FOODS } from "@/data/foods";
-import { Food, UserProfile } from "@/types";
-
-const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? "/api";
+import { Food, FoodLogEntry, UserProfile, WeightEntry } from "@/types";
+import { authedFetch } from "./auth";
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
-    ...init,
-  });
+  const res = await authedFetch(path, init);
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`${res.status} ${res.statusText}: ${text}`);
@@ -145,7 +141,7 @@ export async function scanFood(imageDataUrl: string): Promise<ScanResult> {
     const blob = await (await fetch(imageDataUrl)).blob();
     const fd = new FormData();
     fd.append("image", blob, "food.jpg");
-    const res = await fetch(`${API_BASE}/scan-food`, { method: "POST", body: fd });
+    const res = await authedFetch(`/scan-food`, { method: "POST", body: fd });
     if (res.ok) {
       const data = (await res.json()) as { success: boolean; result: ScanResult };
       if (data?.result) return data.result;
@@ -204,3 +200,167 @@ export async function chatReply(message: string, profile: UserProfile | null): P
   }
   return "I'm your NutraFit assistant! Ask me about Indian foods, calories, BMI, weight goals, or specific health conditions.";
 }
+
+// ---------- User Profile (backend-synced) ----------
+type BackendUser = {
+  id: number;
+  name: string | null;
+  age: number | null;
+  height: number | null;
+  weight: number | null;
+  bmi: number | null;
+  preferences: string | null;
+  allergies: string[] | null;
+  dislikes: string[] | null;
+  cuisinePreference: string | null;
+  healthCondition: string | null;
+};
+
+function userToProfile(u: BackendUser | null | undefined): UserProfile | null {
+  if (!u || !u.name || u.age == null || u.height == null || u.weight == null) return null;
+  const bmi = u.bmi ?? calcBMI(u.weight, u.height);
+  const dailyCalorieGoal = calcDailyCalories({
+    age: u.age,
+    weight: u.weight,
+    height: u.height,
+    gender: "male",
+  });
+  return {
+    name: u.name,
+    age: u.age,
+    height: u.height,
+    weight: u.weight,
+    gender: "male",
+    bmi,
+    preferences: ((u.preferences as UserProfile["preferences"]) ?? "veg"),
+    likes: "",
+    dislikes: (u.dislikes ?? []).join(", "),
+    allergies: (u.allergies ?? []).join(", "),
+    cuisinePreference: ((u.cuisinePreference as UserProfile["cuisinePreference"]) ?? "Mixed"),
+    healthCondition: u.healthCondition ?? "",
+    dailyCalorieGoal,
+  };
+}
+
+export async function fetchUser(): Promise<UserProfile | null> {
+  try {
+    const res = await http<{ success: boolean; user: BackendUser }>("/user");
+    return userToProfile(res?.user);
+  } catch {
+    return null;
+  }
+}
+
+export async function saveUser(profile: UserProfile): Promise<void> {
+  try {
+    await http("/user", {
+      method: "POST",
+      body: JSON.stringify({
+        name: profile.name,
+        age: profile.age,
+        height: profile.height,
+        weight: profile.weight,
+        preferences: profile.preferences,
+        allergies: profile.allergies ? profile.allergies.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        dislikes: profile.dislikes ? profile.dislikes.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        cuisinePreference: profile.cuisinePreference,
+        healthCondition: profile.healthCondition,
+      }),
+    });
+  } catch (e) {
+    console.warn("saveUser failed", e);
+  }
+}
+
+// ---------- Food Logs (backend-synced) ----------
+type BackendFoodLog = {
+  id: number;
+  userId: number | null;
+  foodName: string;
+  calories: number | null;
+  nutrients: Record<string, unknown> | null;
+  date: string;
+};
+
+function logToEntry(l: BackendFoodLog): FoodLogEntry {
+  const n = (l.nutrients ?? {}) as Record<string, number | string>;
+  return {
+    id: String(l.id),
+    foodId: String(n.foodId ?? ""),
+    name: l.foodName,
+    servings: Number(n.servings ?? 1),
+    calories: Number(l.calories ?? 0),
+    protein: Number(n.protein ?? 0),
+    carbs: Number(n.carbs ?? 0),
+    fats: Number(n.fats ?? 0),
+    meal: ((n.meal as FoodLogEntry["meal"]) ?? "snack"),
+    date: l.date.slice(0, 10),
+    loggedAt: new Date(l.date).getTime(),
+  };
+}
+
+export async function fetchFoodLogs(): Promise<FoodLogEntry[]> {
+  try {
+    const res = await http<{ success: boolean; logs: BackendFoodLog[] }>("/food");
+    return (res?.logs ?? []).map(logToEntry);
+  } catch {
+    return [];
+  }
+}
+
+export async function createFoodLog(e: Omit<FoodLogEntry, "id" | "loggedAt">): Promise<FoodLogEntry | null> {
+  try {
+    const res = await http<{ success: boolean; log: BackendFoodLog }>("/food", {
+      method: "POST",
+      body: JSON.stringify({
+        foodName: e.name,
+        calories: e.calories,
+        date: `${e.date}T12:00:00.000Z`,
+        nutrients: {
+          foodId: e.foodId,
+          servings: e.servings,
+          protein: e.protein,
+          carbs: e.carbs,
+          fats: e.fats,
+          meal: e.meal,
+        },
+      }),
+    });
+    return res?.log ? logToEntry(res.log) : null;
+  } catch (err) {
+    console.warn("createFoodLog failed", err);
+    return null;
+  }
+}
+
+export async function deleteFoodLog(id: string): Promise<void> {
+  try {
+    await http(`/food/${id}`, { method: "DELETE" });
+  } catch (e) {
+    console.warn("deleteFoodLog failed", e);
+  }
+}
+
+// ---------- Weight (backend-synced) ----------
+type BackendWeight = { id: number; userId: number; weight: number; date: string };
+
+export async function fetchWeights(): Promise<WeightEntry[]> {
+  try {
+    const res = await http<{ success: boolean; logs: BackendWeight[] }>("/weight");
+    return (res?.logs ?? []).map((w) => ({ date: w.date.slice(0, 10), weight: Number(w.weight) }));
+  } catch {
+    return [];
+  }
+}
+
+export async function saveWeight(w: WeightEntry): Promise<void> {
+  try {
+    await http("/weight", {
+      method: "POST",
+      body: JSON.stringify({ weight: w.weight, date: `${w.date}T12:00:00.000Z` }),
+    });
+  } catch (e) {
+    console.warn("saveWeight failed", e);
+  }
+}
+

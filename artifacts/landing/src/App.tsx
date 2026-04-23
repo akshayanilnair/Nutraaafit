@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,7 +16,8 @@ import Recipes from "./pages/Recipes";
 import HealthGuide from "./pages/HealthGuide";
 import Progress from "./pages/Progress";
 import Chatbot from "./pages/Chatbot";
-import { useUser } from "@/store";
+import { useFoodLog, useUser, useWeights } from "@/store";
+import { ensureToken } from "@/lib/auth";
 
 const queryClient = new QueryClient();
 
@@ -25,11 +27,30 @@ function Protected({ children }: { children: JSX.Element }) {
   return children;
 }
 
+function HydrateBackend() {
+  const hydrateUser = useUser((s) => s.hydrate);
+  const hydrateFood = useFoodLog((s) => s.hydrate);
+  const hydrateWeights = useWeights((s) => s.hydrate);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      await ensureToken();
+      if (cancelled) return;
+      void hydrateUser();
+      void hydrateFood();
+      void hydrateWeights();
+    })();
+    return () => { cancelled = true; };
+  }, [hydrateUser, hydrateFood, hydrateWeights]);
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner position="top-right" />
+      <HydrateBackend />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
