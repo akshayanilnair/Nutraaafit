@@ -11,6 +11,7 @@ import healthGuideRouter from "./healthGuide";
 import summaryRouter from "./summary";
 import weightRouter from "./weight";
 import goalsRouter from "./goals";
+import streakRouter from "./streak";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(healthGuideRouter);
 router.use(summaryRouter);
 router.use(weightRouter);
 router.use(goalsRouter);
+router.use(streakRouter);
 
 export default router;
