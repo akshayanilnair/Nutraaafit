@@ -1,10 +1,147 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-html, body, #root {
-  height: 100%;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* NutraFit AI — warm Indian wellness palette */
+    --background: 36 40% 97%;
+    --foreground: 180 35% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 180 35% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 180 35% 12%;
+
+    /* Deep teal */
+    --primary: 178 65% 26%;
+    --primary-foreground: 36 40% 97%;
+    --primary-glow: 174 55% 42%;
+
+    /* Soft cream secondary */
+    --secondary: 36 35% 92%;
+    --secondary-foreground: 180 35% 12%;
+
+    --muted: 36 25% 94%;
+    --muted-foreground: 180 12% 38%;
+
+    /* Saffron accent */
+    --accent: 32 92% 56%;
+    --accent-foreground: 180 35% 12%;
+    --accent-soft: 38 90% 90%;
+
+    /* Turmeric / fresh leaf */
+    --turmeric: 42 95% 58%;
+    --leaf: 142 50% 42%;
+    --chili: 8 78% 56%;
+
+    --destructive: 0 75% 52%;
+    --destructive-foreground: 36 40% 97%;
+
+    --border: 180 15% 88%;
+    --input: 180 15% 90%;
+    --ring: 178 65% 26%;
+
+    --radius: 1rem;
+
+    --gradient-hero: linear-gradient(135deg, hsl(178 65% 26%) 0%, hsl(174 55% 42%) 50%, hsl(32 92% 56%) 100%);
+    --gradient-card: linear-gradient(160deg, hsl(0 0% 100%) 0%, hsl(36 35% 96%) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(32 92% 56%) 0%, hsl(8 78% 56%) 100%);
+    --gradient-cool: linear-gradient(135deg, hsl(178 65% 26%) 0%, hsl(174 55% 42%) 100%);
+    --gradient-leaf: linear-gradient(135deg, hsl(142 50% 42%) 0%, hsl(174 55% 42%) 100%);
+
+    --shadow-soft: 0 2px 12px -4px hsl(178 40% 20% / 0.08);
+    --shadow-card: 0 8px 30px -12px hsl(178 40% 20% / 0.15);
+    --shadow-glow: 0 12px 40px -10px hsl(178 65% 26% / 0.35);
+    --shadow-warm: 0 12px 40px -10px hsl(32 92% 56% / 0.35);
+
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 36 40% 97%;
+    --sidebar-foreground: 180 35% 12%;
+    --sidebar-primary: 178 65% 26%;
+    --sidebar-primary-foreground: 36 40% 97%;
+    --sidebar-accent: 36 35% 92%;
+    --sidebar-accent-foreground: 180 35% 12%;
+    --sidebar-border: 180 15% 88%;
+    --sidebar-ring: 178 65% 26%;
+  }
+
+  .dark {
+    --background: 180 30% 8%;
+    --foreground: 36 30% 95%;
+    --card: 180 28% 11%;
+    --card-foreground: 36 30% 95%;
+    --popover: 180 28% 11%;
+    --popover-foreground: 36 30% 95%;
+    --primary: 174 55% 50%;
+    --primary-foreground: 180 30% 8%;
+    --primary-glow: 174 55% 60%;
+    --secondary: 180 20% 16%;
+    --secondary-foreground: 36 30% 95%;
+    --muted: 180 20% 16%;
+    --muted-foreground: 36 15% 65%;
+    --accent: 32 92% 60%;
+    --accent-foreground: 180 30% 8%;
+    --accent-soft: 32 30% 20%;
+    --turmeric: 42 95% 60%;
+    --leaf: 142 50% 50%;
+    --chili: 8 78% 60%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 36 30% 95%;
+    --border: 180 18% 20%;
+    --input: 180 18% 20%;
+    --ring: 174 55% 50%;
+  }
 }
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
 }
+
+@layer utilities {
+  .font-display { font-family: 'Fraunces', Georgia, serif; }
+  .bg-gradient-hero { background: var(--gradient-hero); }
+  .bg-gradient-card { background: var(--gradient-card); }
+  .bg-gradient-warm { background: var(--gradient-warm); }
+  .bg-gradient-cool { background: var(--gradient-cool); }
+  .bg-gradient-leaf { background: var(--gradient-leaf); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-warm { box-shadow: var(--shadow-warm); }
+  .transition-smooth { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  70% { box-shadow: 0 0 0 18px hsl(var(--primary) / 0); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-pulse-ring { animation: pulse-ring 2s infinite; }
