@@ -23,7 +23,6 @@ Frontend: React.js / JavaScript
 Backend: Node.js, Express.js
 Database: Supabase
 AI: LLM-based recommendation system
-Deployment: Lovable (Frontend), Replit/Vercel (Backend)
 🧩 Architecture
 
 User → Frontend → Backend → AI Layer → Database → Response
