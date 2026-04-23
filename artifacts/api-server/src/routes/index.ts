@@ -8,6 +8,7 @@ import mealPlanRouter from "./mealPlan";
 import recipeRouter from "./recipe";
 import chatRouter from "./chat";
 import healthGuideRouter from "./healthGuide";
+import summaryRouter from "./summary";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(mealPlanRouter);
 router.use(recipeRouter);
 router.use(chatRouter);
 router.use(healthGuideRouter);
+router.use(summaryRouter);
 
 export default router;
