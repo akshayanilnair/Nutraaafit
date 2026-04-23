@@ -1,0 +1,112 @@
+🚀 FINAL BACKEND INTEGRATION PROMPT
+
+You are an expert full-stack developer.
+
+I already have a fully functional frontend built using Lovable.
+Frontend URL: https://my-desi-nutrition.lovable.app
+
+Your task is to build a complete backend API in Replit (Node.js + Express) and connect it seamlessly with this existing frontend.
+
+🎯 GOAL
+DO NOT build frontend again
+ONLY build backend APIs
+Ensure APIs match frontend requirements
+Make everything fully functional end-to-end
+⚠️ IMPORTANT
+Analyze the frontend behavior from the given URL
+Identify all required API calls (food logging, meal planner, etc.)
+Create backend APIs accordingly
+Ensure proper request/response formats
+🧠 APP CONTEXT
+
+The app is NutraFit AI, an AI-powered nutrition tracking system focused on Indian cuisines.
+
+🛠 BACKEND REQUIREMENTS
+Tech Stack
+Node.js
+Express.js
+MongoDB Atlas
+OpenAI API
+Multer (for image uploads)
+⚙️ REQUIRED API ENDPOINTS
+👤 User
+POST /api/user → create user (age, height, weight → BMI)
+GET /api/user → fetch user
+🍽 Food Logging
+POST /api/food → add food log
+GET /api/food → get logs
+📷 Food Scanner
+POST /api/scan-food
+Accept image
+Detect food using AI
+Return calories + nutrients
+🤖 AI Meal Planner
+POST /api/meal-plan
+Inputs:
+preferences (veg/non-veg)
+dislikes
+allergies
+cuisine (north/south/east/west)
+
+Output:
+
+structured meal plan
+🥗 Recipe AI
+POST /api/recipe
+Input: ingredients
+Output: recipe
+💬 Chatbot
+POST /api/chat
+Return conversational response
+🩺 Health Guidance
+POST /api/health-guide
+Input: health condition
+Output:
+foods to eat
+foods to avoid
+🧩 DATABASE STRUCTURE
+User
+age
+height
+weight
+bmi
+preferences
+allergies
+dislikes
+cuisinePreference
+healthCondition
+Food Logs
+userId
+foodName
+calories
+nutrients
+date
+🔗 FRONTEND INTEGRATION
+Enable CORS for frontend URL
+Use JSON responses
+Ensure endpoints are RESTful
+Match frontend expectations
+🔧 BUILD STEPS
+Initialize Node.js project in Replit
+Install dependencies: express, mongoose, cors, dotenv, multer
+Connect MongoDB Atlas
+Create models (User, FoodLog)
+Build API routes
+Integrate OpenAI API
+Implement food scanner logic
+Add middleware (error handling, file upload)
+Test all APIs with frontend
+Ensure stable responses
+🚀 DEPLOYMENT
+Backend runs inside Replit
+Ensure public URL is generated
+Use that URL in frontend API calls
+🎯 FINAL OUTPUT
+
+A fully working backend API that:
+
+Connects with the Lovable frontend
+Handles all features (logging, AI, scanner, chatbot)
+Uses MongoDB for storage
+Uses OpenAI for intelligence
+Works smoothly end-to-end
