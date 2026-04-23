@@ -2,6 +2,8 @@ import { pgTable, serial, text, real, jsonb, timestamp } from "drizzle-orm/pg-co
 
 export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
+  email: text("email").unique(),
+  passwordHash: text("password_hash"),
   name: text("name"),
   age: real("age"),
   height: real("height"),

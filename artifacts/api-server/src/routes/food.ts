@@ -1,19 +1,22 @@
 import { Router, type IRouter } from "express";
 import { db, foodLogsTable } from "@workspace/db";
 import { desc, eq } from "drizzle-orm";
+import { optionalAuth } from "../lib/auth";
 
 const router: IRouter = Router();
 
-router.post("/food", async (req, res) => {
+// If authenticated, scope log to that user. Otherwise accept userId in body for compat.
+router.post("/food", optionalAuth, async (req, res) => {
   try {
     const { userId, foodName, calories, nutrients, date } = req.body ?? {};
     if (!foodName) {
       return res.status(400).json({ success: false, error: "foodName is required" });
     }
+    const effectiveUserId = req.auth?.userId ?? (userId != null ? Number(userId) : null);
     const [created] = await db
       .insert(foodLogsTable)
       .values({
-        userId: userId != null ? Number(userId) : null,
+        userId: effectiveUserId,
         foodName: String(foodName),
         calories: calories != null ? Number(calories) : null,
         nutrients: nutrients ?? {},
@@ -27,17 +30,20 @@ router.post("/food", async (req, res) => {
   }
 });
 
-router.get("/food", async (req, res) => {
+// If authenticated, only that user's logs. Otherwise filter by ?userId= or all.
+router.get("/food", optionalAuth, async (req, res) => {
   try {
     const userIdParam = req.query["userId"];
-    const query = db.select().from(foodLogsTable).orderBy(desc(foodLogsTable.date));
-    const logs = userIdParam
+    const effectiveUserId = req.auth?.userId
+      ?? (userIdParam != null ? Number(userIdParam) : null);
+
+    const logs = effectiveUserId != null
       ? await db
           .select()
           .from(foodLogsTable)
-          .where(eq(foodLogsTable.userId, Number(userIdParam)))
+          .where(eq(foodLogsTable.userId, effectiveUserId))
           .orderBy(desc(foodLogsTable.date))
-      : await query;
+      : await db.select().from(foodLogsTable).orderBy(desc(foodLogsTable.date));
     res.json({ success: true, logs });
   } catch (err) {
     req.log.error({ err }, "list food logs failed");
