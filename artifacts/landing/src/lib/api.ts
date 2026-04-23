@@ -143,8 +143,23 @@ export async function scanFood(imageDataUrl: string): Promise<ScanResult> {
     fd.append("image", blob, "food.jpg");
     const res = await authedFetch(`/scan-food`, { method: "POST", body: fd });
     if (res.ok) {
-      const data = (await res.json()) as { success: boolean; result: ScanResult };
-      if (data?.result) return data.result;
+      const data = (await res.json()) as {
+        success: boolean;
+        foodName?: string;
+        confidence?: number;
+        calories?: number;
+        nutrients?: { protein_g?: number; carbs_g?: number; fat_g?: number };
+      };
+      if (data?.foodName) {
+        return {
+          food: data.foodName,
+          confidence: typeof data.confidence === "number" ? data.confidence : 0.85,
+          calories: Number(data.calories ?? 0),
+          protein: Number(data.nutrients?.protein_g ?? 0),
+          carbs: Number(data.nutrients?.carbs_g ?? 0),
+          fats: Number(data.nutrients?.fat_g ?? 0),
+        };
+      }
     }
   } catch (e) {
     console.warn("scan API failed, using local fallback", e);

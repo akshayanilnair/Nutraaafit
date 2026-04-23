@@ -118,11 +118,11 @@
 
 @layer utilities {
   .font-display { font-family: 'Fraunces', Georgia, serif; }
-  .bg-gradient-hero { background: var(--gradient-hero); }
-  .bg-gradient-card { background: var(--gradient-card); }
-  .bg-gradient-warm { background: var(--gradient-warm); }
-  .bg-gradient-cool { background: var(--gradient-cool); }
-  .bg-gradient-leaf { background: var(--gradient-leaf); }
+  .bg-gradient-hero { background-image: var(--gradient-hero); }
+  .bg-gradient-card { background-image: var(--gradient-card); }
+  .bg-gradient-warm { background-image: var(--gradient-warm); }
+  .bg-gradient-cool { background-image: var(--gradient-cool); }
+  .bg-gradient-leaf { background-image: var(--gradient-leaf); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
