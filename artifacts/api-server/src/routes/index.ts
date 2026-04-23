@@ -12,6 +12,7 @@ import summaryRouter from "./summary";
 import weightRouter from "./weight";
 import goalsRouter from "./goals";
 import streakRouter from "./streak";
+import foodSearchRouter from "./foodSearch";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(summaryRouter);
 router.use(weightRouter);
 router.use(goalsRouter);
 router.use(streakRouter);
+router.use(foodSearchRouter);
 
 export default router;
