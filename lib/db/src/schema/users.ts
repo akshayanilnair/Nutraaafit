@@ -14,6 +14,11 @@ export const usersTable = pgTable("users", {
   dislikes: jsonb("dislikes").$type<string[]>().default([]),
   cuisinePreference: text("cuisine_preference"),
   healthCondition: text("health_condition"),
+  calorieGoal: real("calorie_goal"),
+  proteinGoal: real("protein_goal"),
+  carbsGoal: real("carbs_goal"),
+  fatGoal: real("fat_goal"),
+  weightGoal: real("weight_goal"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

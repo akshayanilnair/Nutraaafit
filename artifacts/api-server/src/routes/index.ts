@@ -10,6 +10,7 @@ import chatRouter from "./chat";
 import healthGuideRouter from "./healthGuide";
 import summaryRouter from "./summary";
 import weightRouter from "./weight";
+import goalsRouter from "./goals";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(chatRouter);
 router.use(healthGuideRouter);
 router.use(summaryRouter);
 router.use(weightRouter);
+router.use(goalsRouter);
 
 export default router;
